@@ -1,14 +1,12 @@
 /* Template for process A, B and C */
 /* Per Strömgren 2003-02-11 */
-/*
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 
-const int FALSE=0;
-const int TRUE=1;
 
 
 /* The p() and v() procedures implement the Wait and Signal function respectively */

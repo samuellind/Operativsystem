@@ -6,9 +6,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
+#include "common.h"
 
-const int FALSE=0;
-const int TRUE=1;
 
 int fd, ok;
 
@@ -30,19 +29,10 @@ int p(char * signalname){
         Post:  File with "signalname" created or, if creation failed, problem text written and exited
 */
 int v(char * signalname){
-	fd =open(signalname,O_CREAT|O_EXCL|O_WRONLY,S_IWUSR);
-	while(fd!=-1);
-	/* Set the signal, i.e. create the file */
-	/* If the file can't be reated, do an "exit(-1)" */
+	int fd =-1;
+	while(fd<0){
+		fd = open(signalname,O_CREAT|O_EXCL|O_WRONLY,S_IWUSR);
+		}
+	//close(fd);
 	return 0;
 }
-
-/*int main(){
-        Some printfs, signals and/or waits here  
-        char *name;
-        int perms;
-	while(TRUE){
-		// Some printfs, signals and/or waits here 	
-	}
-	return 0;
-}*/
