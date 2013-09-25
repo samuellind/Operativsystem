@@ -4,8 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "common.h"
-#include "common.c"
+
 
 /* redefine the program names if you want */
 #define PRG_A "./PRG_A"
@@ -15,60 +18,64 @@
 const int FALSE=0;
 const int TRUE=1;
 
+int processid1,processid2,processid3;
 
 /* Clean-up function */
 /* Pre: True
    Post: all signalling files removed, all daughter processes killed */
 void cleanup(){
-        /* Some code is needed here */
+        
+        kill(processid1, SIGTERM);
+        kill(processid2, SIGTERM);
+        kill(processid3, SIGTERM);
+        
+        p("a.lock");
+        p("b.lock");
+        p("c.lock");
+        
+        exit(0);
 }
 
 
 int main(int argc, char* argv[])
 {
-	int processid;
-	p("a.lock");
-	p("b.lock");
-	p("c.lock");
+	
+	v("a.lock");
+	v("b.lock");
+	v("c.lock");
 	
 	/* Set up reception of CTRL-C or other */
+	signal(SIGINT, cleanup);
+	
 
 	/* create the A, B and C processes */
 	
-	if ((processid=fork()) == 0)
+	if ((processid1=fork()) == 0)
 	{
 		execlp(PRG_A,PRG_A,NULL);
 		/* If we return from execlp, it failed */
 		printf("\n\"%s\" couldn't be executed. Check that it exists\n",PRG_A);
 		exit(-1);
 	}
-	if ((processid=fork()) == 0)
+
+	if ((processid2=fork()) == 0)
 	{
 		execlp(PRG_B,PRG_B,NULL);
 		/* If we return from execlp, it failed */
 		printf("\n\"%s\" couldn't be executed. Check that it exists\n",PRG_B);
 		exit(-1);
 	}
-	if ((processid=fork()) == 0)
+
+	if ((processid3=fork()) == 0)
 	{
 		execlp(PRG_C,PRG_C,NULL);
 		/* If we return from execlp, it failed */
 		printf("\n\"%s\" couldn't be executed. Check that it exists\n",PRG_C);
 		exit(-1);
 	}
-	printf("\nProcesses started if no error messages displayed, use \"ps\" command to check.\n ");
-	/* wait here for a CTRL-C */
-	
-	while(1)
-	;
-	//interupt ctrl-c;
-	
-	int i;
-	for(i=0;i<3;i++)
-	{
-		wait(NULL);
-	}
-	printf("All processes terminated\n");
+
+	while(1);
+
 	
 	return 0;
 }
